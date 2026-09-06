@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบสอบถามความคิดเห็นแพทย์ Part-time | โรงพยาบาลกรุงเทพสุราษฎร์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#173650;
+    --navy-deep:#0f2538;
+    --teal:#4d8b8a;
+    --paper:#faf8f4;
+    --paper-raised:#ffffff;
+    --line:#dde3e2;
+    --ink:#1c2226;
+    --ink-soft:#57626a;
+    --amber:#c98a2c;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Sarabun',sans-serif;
+    font-size:16px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px 80px;}
+
+  header.hero{
+    background:linear-gradient(180deg,var(--navy-deep) 0%,var(--navy) 100%);
+    color:#f2efe9;
+    padding:56px 20px 46px;
+  }
+  header.hero .inner{max-width:720px;margin:0 auto;}
+  .tag{
+    font-family:'Sarabun',sans-serif;
+    font-size:13.5px;
+    color:#b9cdd6;
+    letter-spacing:.2px;
+    margin:0 0 14px;
+  }
+  h1.title{
+    font-family:'Noto Serif Thai',serif;
+    font-weight:600;
+    font-size:clamp(26px,4.4vw,34px);
+    line-height:1.35;
+    margin:0 0 10px;
+  }
+  .hero p.desc{
+    color:#cfd9dc;
+    font-size:15px;
+    max-width:56ch;
+    margin:0;
+  }
+
+  .progress-shell{
+    position:sticky; top:0; z-index:20;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    padding:12px 20px;
+  }
+  .progress-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:14px;}
+  .progress-track{flex:1;height:4px;background:var(--line);border-radius:2px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--teal);border-radius:2px;transition:width .35s ease;}
+  .progress-label{font-size:13px;color:var(--ink-soft);white-space:nowrap;font-variant-numeric:tabular-nums;}
+
+  .card{display:none;}
+  .card.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .section-head{margin:40px 0 22px;}
+  .section-num{font-size:13px;color:var(--teal);font-weight:600;margin:0 0 4px;}
+  .section-title{
+    font-family:'Noto Serif Thai',serif;
+    font-weight:600;
+    font-size:22px;
+    margin:0;
+    color:var(--navy-deep);
+  }
+
+  .q{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:20px 22px;
+    margin-bottom:14px;
+  }
+  .q-text{font-weight:600;font-size:15.5px;margin:0 0 14px;color:var(--ink);}
+  .q-num{color:var(--teal);font-weight:700;margin-inline-end:6px;}
+  .q-hint{font-size:13px;color:var(--ink-soft);margin:-10px 0 14px;}
+
+  .opt-list{display:flex;flex-direction:column;gap:9px;}
+  label.opt{
+    display:flex; align-items:flex-start; gap:10px;
+    font-size:15px; cursor:pointer; padding:8px 10px;
+    border:1px solid transparent; border-radius:2px;
+  }
+  label.opt:hover{background:#f4f6f5;}
+  label.opt input{margin-top:3px; accent-color:var(--teal); width:16px;height:16px;flex:none;}
+  .opt-other-input{
+    margin-top:6px; margin-inline-start:26px;
+    border:none; border-bottom:1px solid var(--line);
+    background:transparent; padding:6px 2px; font-family:inherit; font-size:14.5px;
+    width:calc(100% - 26px); color:var(--ink);
+  }
+  .opt-other-input:focus{outline:none;border-bottom-color:var(--teal);}
+
+  textarea, select{
+    width:100%; font-family:'Sarabun',sans-serif; font-size:15px;
+    padding:10px 12px; border:1px solid var(--line); border-radius:2px;
+    background:#fff; color:var(--ink);
+  }
+  textarea{min-height:90px;resize:vertical;}
+  select{appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%2357626a' stroke-width='1.6' fill='none'/></svg>"); background-repeat:no-repeat; background-position:right 12px center; padding-inline-end:32px;}
+  textarea:focus, select:focus{outline:none;border-color:var(--teal);}
+
+  .likert-table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  .likert-table th{font-weight:600; color:var(--ink-soft); padding:6px 4px; text-align:center; font-size:12.5px;}
+  .likert-table td{padding:10px 4px; border-top:1px solid var(--line); text-align:center;}
+  .likert-table td.row-label{text-align:start; font-size:14.5px; color:var(--ink); padding-inline-end:8px; width:44%;}
+  .likert-table input{accent-color:var(--teal); width:16px;height:16px;}
+
+  .stars{display:flex;gap:6px;}
+  .star-btn{
+    width:34px;height:34px;border-radius:50%;
+    border:1px solid var(--line); background:#fff;
+    font-size:16px; cursor:pointer; color:var(--ink-soft);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .star-btn.on{background:var(--amber); border-color:var(--amber); color:#fff;}
+
+  .nps-row{display:grid; grid-template-columns:repeat(11,1fr); gap:6px; margin-top:4px;}
+  .nps-btn{
+    aspect-ratio:1; border-radius:2px; border:1px solid var(--line); background:#fff;
+    font-size:14px; cursor:pointer; color:var(--ink);
+  }
+  .nps-btn.on{background:var(--navy); border-color:var(--navy); color:#fff;}
+  .nps-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);margin-top:6px;}
+
+  .limit-note{font-size:12.5px; color:var(--amber); margin-top:8px; display:none;}
+  .limit-note.show{display:block;}
+
+  .nav-row{display:flex; justify-content:space-between; gap:12px; margin-top:28px;}
+  button.btn{
+    font-family:'Sarabun',sans-serif; font-weight:600; font-size:15px;
+    padding:13px 26px; border-radius:2px; border:1px solid var(--navy);
+    background:var(--navy); color:#fff; cursor:pointer;
+  }
+  button.btn.secondary{background:transparent; color:var(--navy);}
+  button.btn:disabled{opacity:.4; cursor:not-allowed;}
+
+  .status{
+    margin-top:16px; font-size:14px; color:var(--ink-soft); text-align:center; min-height:20px;
+  }
+  .status.err{color:#b3432c;}
+
+  .done{
+    text-align:center; padding:60px 20px;
+  }
+  .done h2{font-family:'Noto Serif Thai',serif; color:var(--navy-deep); font-size:26px;}
+  .done p{color:var(--ink-soft);}
+
+  footer{max-width:720px;margin:40px auto 0;padding:0 20px;font-size:12.5px;color:var(--ink-soft);text-align:center;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner">
+    <p class="tag">โครงการพัฒนาการเพิ่มจำนวนผู้ป่วย Elective Surgery และ GI Procedures</p>
+    <h1 class="title">แบบสอบถามความคิดเห็นแพทย์ Part-time</h1>
+    <p class="desc">โรงพยาบาลกรุงเทพสุราษฎร์ขอความร่วมมือจากท่านในการให้ข้อเสนอแนะเกี่ยวกับประสบการณ์การทำงาน ปัญหาอุปสรรค และแนวทางพัฒนาระบบบริการ ข้อมูลทั้งหมดถือเป็นความลับและใช้เพื่อการพัฒนาระบบเท่านั้น ใช้เวลาประมาณ 5-7 นาที</p>
+  </div>
+</header>
+
+<div class="progress-shell">
+  <div class="progress-inner">
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:12.5%"></div></div>
+    <div class="progress-label" id="progressLabel">ส่วนที่ 1 / 8</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <form id="surveyForm">
+
+    <!-- SECTION 1 -->
+    <div class="card active" data-section="1">
+      <div class="section-head"><p class="section-num">SECTION 1</p><h2 class="section-title">ข้อมูลทั่วไป</h2></div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">1.</span>สาขาความเชี่ยวชาญของท่าน</p>
+        <select name="q1_specialty" required>
+          <option value="" disabled selected>เลือกสาขา</option>
+          <option>ศัลยกรรมทั่วไป</option>
+          <option>ศัลยกรรมกระดูก</option>
+          <option>ศัลยกรรมทางเดินปัสสาวะ</option>
+          <option>ศัลยกรรมประสาท</option>
+          <option>ศัลยกรรมหัวใจ</option>
+          <option>สูตินรีเวช</option>
+          <option>อายุรศาสตร์ทางเดินอาหาร (GI)</option>
+          <option>อายุรศาสตร์ทั่วไป</option>
+          <option>ENT</option>
+          <option>จักษุวิทยา</option>
+          <option>ศัลยกรรมตกแต่ง</option>
+          <option>อื่นๆ</option>
+        </select>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">2.</span>ระยะเวลาที่ท่านเข้ามาให้บริการที่โรงพยาบาล</p>
+        <div class="opt-list">
+          <label class="opt"><input type="radio" name="q2_duration" value="น้อยกว่า 1 ปี" required>น้อยกว่า 1 ปี</label>
+          <label class="opt"><input type="radio" name="q2_duration" value="1-3 ปี">1-3 ปี</label>
+          <label class="opt"><input type="radio" name="q2_duration" value="3-5 ปี">3-5 ปี</label>
+          <label class="opt"><input type="radio" name="q2_duration" value="มากกว่า 5 ปี">มากกว่า 5 ปี</label>
+        </div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">3.</span>จำนวนวันออกตรวจเฉลี่ยต่อเดือน</p>
+        <div class="opt-list">
+          <label class="opt"><input type="radio" name="q3_days" value="1-2 วัน" required>1-2 วัน</label>
+          <label class="opt"><input type="radio" name="q3_days" value="3-5 วัน">3-5 วัน</label>
+          <label class="opt"><input type="radio" name="q3_days" value="6-10 วัน">6-10 วัน</label>
+          <label class="opt"><input type="radio" name="q3_days" value="มากกว่า 10 วัน">มากกว่า 10 วัน</label>
+        </div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">4.</span>จำนวนผู้ป่วยที่ท่านส่งเข้าผ่าตัดหรือทำหัตถการในโรงพยาบาลโดยเฉลี่ยต่อเดือน</p>
+        <div class="opt-list">
+          <label class="opt"><input type="radio" name="q4_volume" value="น้อยกว่า 5 ราย" required>น้อยกว่า 5 ราย</label>
+          <label class="opt"><input type="radio" name="q4_volume" value="5-10 ราย">5-10 ราย</label>
+          <label class="opt"><input type="radio" name="q4_volume" value="11-20 ราย">11-20 ราย</label>
+          <label class="opt"><input type="radio" name="q4_volume" value="21-50 ราย">21-50 ราย</label>
+          <label class="opt"><input type="radio" name="q4_volume" value="มากกว่า 50 ราย">มากกว่า 50 ราย</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="card" data-section="2">
+      <div class="section-head"><p class="section-num">SECTION 2</p><h2 class="section-title">การประเมินการสนับสนุนจากโรงพยาบาล</h2></div>
+      <div class="q">
+        <p class="q-text"><span class="q-num">5.</span>โปรดประเมินระดับความพึงพอใจต่อการสนับสนุนจากโรงพยาบาล (1 = น้อยที่สุด, 5 = มากที่สุด)</p>
+        <table class="likert-table" id="likertTable">
+          <thead><tr><th style="text-align:start;"></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+          <tbody id="likertBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="card" data-section="3">
+      <div class="section-head"><p class="section-num">SECTION 3</p><h2 class="section-title">ปัญหาในการนำผู้ป่วยมาใช้บริการ</h2></div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">6.</span>ปัจจัยใดเป็นอุปสรรคสำคัญต่อการส่งผู้ป่วยเข้ารับการผ่าตัด Elective หรือ GI Procedure</p>
+        <p class="q-hint">เลือกได้มากกว่า 1 ข้อ</p>
+        <div class="opt-list" data-checkgroup="q6_barriers">
+          <label class="opt"><input type="checkbox" value="ค่ารักษาพยาบาลสูง">ค่ารักษาพยาบาลสูง</label>
+          <label class="opt"><input type="checkbox" value="ราคาแพ็กเกจไม่แข่งขัน">ราคาแพ็กเกจไม่แข่งขัน</label>
+          <label class="opt"><input type="checkbox" value="ระยะเวลารอคิวผ่าตัดนาน">ระยะเวลารอคิวผ่าตัดนาน</label>
+          <label class="opt"><input type="checkbox" value="ระยะเวลารอคิวส่องกล้องนาน">ระยะเวลารอคิวส่องกล้องนาน</label>
+          <label class="opt"><input type="checkbox" value="การอนุมัติประกันล่าช้า">การอนุมัติประกันล่าช้า</label>
+          <label class="opt"><input type="checkbox" value="ผู้ป่วยไม่มั่นใจในโรงพยาบาล">ผู้ป่วยไม่มั่นใจในโรงพยาบาล</label>
+          <label class="opt"><input type="checkbox" value="ผู้ป่วยต้องการรักษาใกล้บ้าน">ผู้ป่วยต้องการรักษาใกล้บ้าน</label>
+          <label class="opt"><input type="checkbox" value="ขาดผู้ประสานงานติดตามผู้ป่วย">ขาดผู้ประสานงานติดตามผู้ป่วย</label>
+          <label class="opt"><input type="checkbox" value="ระบบนัดหมายยุ่งยาก">ระบบนัดหมายยุ่งยาก</label>
+          <label class="opt"><input type="checkbox" value="เวลาเปิดบริการไม่ตอบโจทย์">เวลาเปิดบริการไม่ตอบโจทย์</label>
+          <label class="opt"><input type="checkbox" value="ห้องผ่าตัดไม่เพียงพอ">ห้องผ่าตัดไม่เพียงพอ</label>
+          <label class="opt"><input type="checkbox" value="ห้องส่องกล้องไม่เพียงพอ">ห้องส่องกล้องไม่เพียงพอ</label>
+          <label class="opt">
+            <input type="checkbox" value="อื่นๆ" data-other-toggle="q6_other">อื่นๆ
+          </label>
+        </div>
+        <input type="text" class="opt-other-input" id="q6_other" style="display:none" placeholder="โปรดระบุ">
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">7.</span>ในความเห็นของท่าน ผู้ป่วยมักปฏิเสธการผ่าตัดหรือหัตถการด้วยเหตุผลใด</p>
+        <p class="q-hint">เลือกได้มากกว่า 1 ข้อ</p>
+        <div class="opt-list" data-checkgroup="q7_refusal">
+          <label class="opt"><input type="checkbox" value="กังวลเรื่องค่าใช้จ่าย">กังวลเรื่องค่าใช้จ่าย</label>
+          <label class="opt"><input type="checkbox" value="กลัวการผ่าตัด">กลัวการผ่าตัด</label>
+          <label class="opt"><input type="checkbox" value="กลัวการดมยา">กลัวการดมยา</label>
+          <label class="opt"><input type="checkbox" value="ต้องการขอความเห็นจากแพทย์ท่านอื่น">ต้องการขอความเห็นจากแพทย์ท่านอื่น</label>
+          <label class="opt"><input type="checkbox" value="เปลี่ยนไปรักษาที่โรงพยาบาลอื่น">เปลี่ยนไปรักษาที่โรงพยาบาลอื่น</label>
+          <label class="opt"><input type="checkbox" value="สิทธิประกันไม่ครอบคลุม">สิทธิประกันไม่ครอบคลุม</label>
+          <label class="opt"><input type="checkbox" value="ญาติไม่เห็นด้วย">ญาติไม่เห็นด้วย</label>
+          <label class="opt"><input type="checkbox" value="อาการยังไม่รุนแรง">อาการยังไม่รุนแรง</label>
+          <label class="opt"><input type="checkbox" value="รอการตัดสินใจ">รอการตัดสินใจ</label>
+          <label class="opt"><input type="checkbox" value="อื่นๆ" data-other-toggle="q7_other">อื่นๆ</label>
+        </div>
+        <input type="text" class="opt-other-input" id="q7_other" style="display:none" placeholder="โปรดระบุ">
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">8.</span>โดยประมาณ ผู้ป่วยที่ท่านแนะนำให้ผ่าตัดหรือทำหัตถการ หลุดจากกระบวนการรักษา (Lost Follow-up) กี่เปอร์เซ็นต์</p>
+        <div class="opt-list">
+          <label class="opt"><input type="radio" name="q8_lostfollowup" value="น้อยกว่า 10%" required>น้อยกว่า 10%</label>
+          <label class="opt"><input type="radio" name="q8_lostfollowup" value="10-20%">10-20%</label>
+          <label class="opt"><input type="radio" name="q8_lostfollowup" value="21-30%">21-30%</label>
+          <label class="opt"><input type="radio" name="q8_lostfollowup" value="31-50%">31-50%</label>
+          <label class="opt"><input type="radio" name="q8_lostfollowup" value="มากกว่า 50%">มากกว่า 50%</label>
+        </div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">9.</span>ปัจจุบันโรงพยาบาลมีการติดตามผู้ป่วยที่ได้รับคำแนะนำให้ผ่าตัดหรือทำหัตถการอย่างมีประสิทธิภาพเพียงใด</p>
+        <div class="stars" data-stars="q9_followup_rating"></div>
+      </div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="card" data-section="4">
+      <div class="section-head"><p class="section-num">SECTION 4</p><h2 class="section-title">การสูญเสียผู้ป่วยให้โรงพยาบาลคู่แข่ง</h2></div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">10.</span>ในช่วง 6 เดือนที่ผ่านมา ท่านเคยส่งผู้ป่วยไปรับการรักษาหรือผ่าตัดที่โรงพยาบาลอื่นหรือไม่</p>
+        <div class="opt-list">
+          <label class="opt"><input type="radio" name="q10_referred_elsewhere" value="ไม่เคย" required>ไม่เคย</label>
+          <label class="opt"><input type="radio" name="q10_referred_elsewhere" value="บางครั้ง">บางครั้ง</label>
+          <label class="opt"><input type="radio" name="q10_referred_elsewhere" value="บ่อยครั้ง">บ่อยครั้ง</label>
+        </div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">11.</span>หากเคยส่งผู้ป่วยไปโรงพยาบาลอื่น สาเหตุหลักคืออะไร</p>
+        <p class="q-hint">เลือกได้มากกว่า 1 ข้อ (ข้ามได้หากไม่เกี่ยวข้อง)</p>
+        <div class="opt-list" data-checkgroup="q11_reason_elsewhere">
+          <label class="opt"><input type="checkbox" value="ค่ารักษาเหมาะสมกว่า">ค่ารักษาเหมาะสมกว่า</label>
+          <label class="opt"><input type="checkbox" value="คิวนัดเร็วกว่า">คิวนัดเร็วกว่า</label>
+          <label class="opt"><input type="checkbox" value="เทคโนโลยีหรือเครื่องมือพร้อมกว่า">เทคโนโลยีหรือเครื่องมือพร้อมกว่า</label>
+          <label class="opt"><input type="checkbox" value="ประกันครอบคลุมมากกว่า">ประกันครอบคลุมมากกว่า</label>
+          <label class="opt"><input type="checkbox" value="การบริการสะดวกกว่า">การบริการสะดวกกว่า</label>
+          <label class="opt"><input type="checkbox" value="มีทีมดูแลผู้ป่วยเฉพาะทาง">มีทีมดูแลผู้ป่วยเฉพาะทาง</label>
+          <label class="opt"><input type="checkbox" value="ผู้ป่วยร้องขอเอง">ผู้ป่วยร้องขอเอง</label>
+          <label class="opt"><input type="checkbox" value="อื่นๆ" data-other-toggle="q11_other">อื่นๆ</label>
+        </div>
+        <input type="text" class="opt-other-input" id="q11_other" style="display:none" placeholder="โปรดระบุ">
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">12.</span>โรงพยาบาลคู่แข่งมีจุดเด่นใดที่ทำให้ผู้ป่วยตัดสินใจใช้บริการ</p>
+        <textarea name="q12_competitor_strength"></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="card" data-section="5">
+      <div class="section-head"><p class="section-num">SECTION 5</p><h2 class="section-title">โอกาสในการเพิ่มจำนวนผู้ป่วย</h2></div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">13.</span>สิ่งใดจะช่วยให้ท่านสามารถนำผู้ป่วยมารับบริการที่โรงพยาบาลได้เพิ่มขึ้น</p>
+        <p class="q-hint">เลือกได้มากกว่า 1 ข้อ</p>
+        <div class="opt-list" data-checkgroup="q13_growth_enablers">
+          <label class="opt"><input type="checkbox" value="เพิ่มรอบห้องผ่าตัด">เพิ่มรอบห้องผ่าตัด</label>
+          <label class="opt"><input type="checkbox" value="เพิ่มรอบ GI Procedure">เพิ่มรอบ GI Procedure</label>
+          <label class="opt"><input type="checkbox" value="ลดระยะเวลารอนัด">ลดระยะเวลารอนัด</label>
+          <label class="opt"><input type="checkbox" value="มี Surgical Coordinator">มี Surgical Coordinator</label>
+          <label class="opt"><input type="checkbox" value="มี GI Coordinator">มี GI Coordinator</label>
+          <label class="opt"><input type="checkbox" value="มี Nurse Navigator">มี Nurse Navigator</label>
+          <label class="opt"><input type="checkbox" value="Fast Track ประกัน">Fast Track ประกัน</label>
+          <label class="opt"><input type="checkbox" value="Fast Track Elective Surgery">Fast Track Elective Surgery</label>
+          <label class="opt"><input type="checkbox" value="Fast Track GI Procedure">Fast Track GI Procedure</label>
+          <label class="opt"><input type="checkbox" value="นัดหมายออนไลน์">นัดหมายออนไลน์</label>
+          <label class="opt"><input type="checkbox" value="แพ็กเกจราคาพิเศษ">แพ็กเกจราคาพิเศษ</label>
+          <label class="opt"><input type="checkbox" value="โปรโมชั่นสนับสนุนผู้ป่วย">โปรโมชั่นสนับสนุนผู้ป่วย</label>
+          <label class="opt"><input type="checkbox" value="สื่อประชาสัมพันธ์โรคและการรักษา">สื่อประชาสัมพันธ์โรคและการรักษา</label>
+          <label class="opt"><input type="checkbox" value="การประชาสัมพันธ์แพทย์">การประชาสัมพันธ์แพทย์</label>
+          <label class="opt"><input type="checkbox" value="อื่นๆ" data-other-toggle="q13_other">อื่นๆ</label>
+        </div>
+        <input type="text" class="opt-other-input" id="q13_other" style="display:none" placeholder="โปรดระบุ">
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">14.</span>หากมีทีม Case Manager ดูแลผู้ป่วยตั้งแต่วันตรวจจนถึงวันผ่าตัด ท่านคิดว่าจะช่วยเพิ่มจำนวนผู้ป่วยได้มากน้อยเพียงใด</p>
+        <div class="stars" data-stars="q14_casemanager_rating"></div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">15.</span>หากโรงพยาบาลเพิ่มความรวดเร็วในการอนุมัติการรักษาและการผ่าตัด ท่านคิดว่าจำนวนผู้ป่วยจะเพิ่มขึ้นหรือไม่</p>
+        <div class="opt-list">
+          <label class="opt"><input type="radio" name="q15_approval_speed_impact" value="ไม่เพิ่ม" required>ไม่เพิ่ม</label>
+          <label class="opt"><input type="radio" name="q15_approval_speed_impact" value="เพิ่มเล็กน้อย">เพิ่มเล็กน้อย</label>
+          <label class="opt"><input type="radio" name="q15_approval_speed_impact" value="เพิ่มปานกลาง">เพิ่มปานกลาง</label>
+          <label class="opt"><input type="radio" name="q15_approval_speed_impact" value="เพิ่มมาก">เพิ่มมาก</label>
+          <label class="opt"><input type="radio" name="q15_approval_speed_impact" value="เพิ่มมากที่สุด">เพิ่มมากที่สุด</label>
+        </div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">16.</span>กลุ่มผู้ป่วยใดมีศักยภาพสูงสุดในการเพิ่ม Volume</p>
+        <p class="q-hint">เลือกได้มากกว่า 1 ข้อ</p>
+        <div class="opt-list" data-checkgroup="q16_growth_segments">
+          <label class="opt"><input type="checkbox" value="ผู้ป่วยตรวจสุขภาพพบความผิดปกติ">ผู้ป่วยตรวจสุขภาพพบความผิดปกติ</label>
+          <label class="opt"><input type="checkbox" value="ผู้ป่วยประกันเอกชน">ผู้ป่วยประกันเอกชน</label>
+          <label class="opt"><input type="checkbox" value="ผู้ป่วยองค์กรคู่สัญญา">ผู้ป่วยองค์กรคู่สัญญา</label>
+          <label class="opt"><input type="checkbox" value="ผู้ป่วยส่งต่อจากคลินิก">ผู้ป่วยส่งต่อจากคลินิก</label>
+          <label class="opt"><input type="checkbox" value="ผู้ป่วยต่างจังหวัด">ผู้ป่วยต่างจังหวัด</label>
+          <label class="opt"><input type="checkbox" value="ผู้ป่วยต่างชาติ">ผู้ป่วยต่างชาติ</label>
+          <label class="opt"><input type="checkbox" value="ผู้ป่วย GI">ผู้ป่วย GI</label>
+          <label class="opt"><input type="checkbox" value="ผู้ป่วยศัลยกรรมเฉพาะทาง">ผู้ป่วยศัลยกรรมเฉพาะทาง</label>
+          <label class="opt"><input type="checkbox" value="อื่นๆ" data-other-toggle="q16_other">อื่นๆ</label>
+        </div>
+        <input type="text" class="opt-other-input" id="q16_other" style="display:none" placeholder="โปรดระบุ">
+      </div>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="card" data-section="6">
+      <div class="section-head"><p class="section-num">SECTION 6</p><h2 class="section-title">การจัดลำดับความสำคัญ</h2></div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">17.</span>โปรดเลือก 3 เรื่องที่โรงพยาบาลควรเร่งพัฒนามากที่สุด</p>
+        <p class="q-hint">เลือกได้สูงสุด 3 ข้อ</p>
+        <div class="opt-list" data-checkgroup="q17_priorities" data-limit="3">
+          <label class="opt"><input type="checkbox" value="เพิ่มจำนวนผู้ป่วยผ่าตัด">เพิ่มจำนวนผู้ป่วยผ่าตัด</label>
+          <label class="opt"><input type="checkbox" value="เพิ่มจำนวนผู้ป่วย GI Procedure">เพิ่มจำนวนผู้ป่วย GI Procedure</label>
+          <label class="opt"><input type="checkbox" value="ลดระยะเวลารอคิว">ลดระยะเวลารอคิว</label>
+          <label class="opt"><input type="checkbox" value="เพิ่มประสิทธิภาพการประสานงาน">เพิ่มประสิทธิภาพการประสานงาน</label>
+          <label class="opt"><input type="checkbox" value="เพิ่มประสิทธิภาพการอนุมัติประกัน">เพิ่มประสิทธิภาพการอนุมัติประกัน</label>
+          <label class="opt"><input type="checkbox" value="เพิ่มการติดตามผู้ป่วย">เพิ่มการติดตามผู้ป่วย</label>
+          <label class="opt"><input type="checkbox" value="พัฒนาแพ็กเกจราคา">พัฒนาแพ็กเกจราคา</label>
+          <label class="opt"><input type="checkbox" value="พัฒนาศักยภาพบุคลากร">พัฒนาศักยภาพบุคลากร</label>
+          <label class="opt"><input type="checkbox" value="เพิ่มห้องผ่าตัด">เพิ่มห้องผ่าตัด</label>
+          <label class="opt"><input type="checkbox" value="เพิ่มห้องส่องกล้อง">เพิ่มห้องส่องกล้อง</label>
+        </div>
+        <p class="limit-note" id="q17_limitnote">เลือกได้สูงสุด 3 ข้อ กรุณายกเลิก 1 ข้อก่อนเลือกใหม่</p>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">18.</span>เรื่องใดที่หากปรับปรุงเพียง 1 เรื่อง จะช่วยเพิ่ม Volume ได้มากที่สุด</p>
+        <textarea name="q18_single_biggest_lever" rows="2"></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 7 -->
+    <div class="card" data-section="7">
+      <div class="section-head"><p class="section-num">SECTION 7</p><h2 class="section-title">Doctor NPS</h2></div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">19.</span>ท่านมีแนวโน้มที่จะแนะนำโรงพยาบาลกรุงเทพสุราษฎร์ให้กับผู้ป่วยของท่านมากน้อยเพียงใด</p>
+        <div class="nps-row" id="npsRow"></div>
+        <div class="nps-ends"><span>0 = ไม่แนะนำเลย</span><span>10 = แนะนำอย่างยิ่ง</span></div>
+      </div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">20.</span>เหตุผลสำคัญที่ท่านให้คะแนนดังกล่าว</p>
+        <textarea name="q20_nps_reason"></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 8 -->
+    <div class="card" data-section="8">
+      <div class="section-head"><p class="section-num">SECTION 8</p><h2 class="section-title">ข้อเสนอแนะจากแพทย์</h2></div>
+
+      <div class="q">
+        <p class="q-text"><span class="q-num">21.</span>ปัญหาสำคัญที่สุด 3 อันดับแรกที่ทำให้ท่านไม่สามารถนำผู้ป่วยมารับการรักษาที่โรงพยาบาลได้</p>
+        <textarea name="q21_top3_problems"></textarea>
+      </div>
+      <div class="q">
+        <p class="q-text"><span class="q-num">22.</span>แนวทางที่โรงพยาบาลควรดำเนินการภายใน 6 เดือนข้างหน้า เพื่อเพิ่มจำนวนผู้ป่วย Elective Surgery และ GI Procedure</p>
+        <textarea name="q22_six_month_actions"></textarea>
+      </div>
+      <div class="q">
+        <p class="q-text"><span class="q-num">23.</span>ข้อเสนอแนะเพิ่มเติมถึงผู้บริหารโรงพยาบาล</p>
+        <textarea name="q23_additional_suggestions"></textarea>
+      </div>
+      <div class="q">
+        <p class="q-text"><span class="q-num">24.</span>หากโรงพยาบาลสามารถแก้ไขปัญหาได้เพียง 1 เรื่อง ท่านต้องการให้แก้ไขเรื่องใดมากที่สุด</p>
+        <textarea name="q24_golden_question"></textarea>
+      </div>
+      <div class="q">
+        <p class="q-text"><span class="q-num">25.</span>ท่านคาดว่าจำนวนผู้ป่วยผ่าตัดหรือ GI Procedure ของท่านจะเพิ่มขึ้นกี่เปอร์เซ็นต์ หากโรงพยาบาลสามารถแก้ไขปัญหาที่ท่านระบุได้สำเร็จ</p>
+        <div class="opt-list">
+          <label class="opt"><input type="radio" name="q25_expected_growth" value="น้อยกว่า 10%" required>น้อยกว่า 10%</label>
+          <label class="opt"><input type="radio" name="q25_expected_growth" value="10-20%">10-20%</label>
+          <label class="opt"><input type="radio" name="q25_expected_growth" value="21-30%">21-30%</label>
+          <label class="opt"><input type="radio" name="q25_expected_growth" value="31-50%">31-50%</label>
+          <label class="opt"><input type="radio" name="q25_expected_growth" value="มากกว่า 50%">มากกว่า 50%</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button type="button" class="btn secondary" id="prevBtn">ย้อนกลับ</button>
+      <button type="button" class="btn" id="nextBtn">ถัดไป</button>
+      <button type="submit" class="btn" id="submitBtn" style="display:none;">ส่งแบบสอบถาม</button>
+    </div>
+    <p class="status" id="statusMsg"></p>
+  </form>
+
+  <div class="done" id="doneScreen" style="display:none;">
+    <h2>ขอบคุณสำหรับความคิดเห็นของท่าน</h2>
+    <p>ข้อมูลของท่านถูกบันทึกเรียบร้อยแล้ว และจะถูกนำไปใช้เพื่อการพัฒนาระบบบริการของโรงพยาบาลต่อไป</p>
+  </div>
+</div>
+
+<footer>ข้อมูลของท่านถูกเก็บเป็นความลับ · โรงพยาบาลกรุงเทพสุราษฎร์</footer>
+
+<script>
+/* ============ CONFIGURATION ============
+   Paste your Google Apps Script Web App URL below (see SETUP_INSTRUCTIONS.md).
+*/
+const GAS_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
+
+/* ---------- build Likert table (question 5) ---------- */
+const likertRows = [
+  ["q5_appointment_system","ระบบนัดหมายผู้ป่วย"],
+  ["q5_staff_coordination","การติดต่อประสานงานของเจ้าหน้าที่"],
+  ["q5_surgery_queue_speed","ความรวดเร็วในการจัดคิวผ่าตัด"],
+  ["q5_gi_queue_speed","ความรวดเร็วในการจัดคิว GI Procedure"],
+  ["q5_or_readiness","ความพร้อมของห้องผ่าตัด"],
+  ["q5_endoscopy_room_readiness","ความพร้อมของห้องส่องกล้อง"],
+  ["q5_equipment_readiness","ความพร้อมของเครื่องมือ"],
+  ["q5_nursing_team_readiness","ความพร้อมของทีมพยาบาล"],
+  ["q5_insurance_finance_speed","ความรวดเร็วด้านประกันและการเงิน"],
+  ["q5_interdept_communication","การสื่อสารระหว่างหน่วยงาน"],
+  ["q5_doctor_facilitation","การอำนวยความสะดวกแก่แพทย์"],
+  ["q5_post_visit_followup","การติดตามผู้ป่วยหลังพบแพทย์"],
+];
+const likertBody = document.getElementById("likertBody");
+likertRows.forEach(([name,label])=>{
+  const tr = document.createElement("tr");
+  let cells = `<td class="row-label">${label}</td>`;
+  for(let i=1;i<=5;i++){
+    cells += `<td><input type="radio" name="${name}" value="${i}" required></td>`;
+  }
+  tr.innerHTML = cells;
+  likertBody.appendChild(tr);
+});
+
+/* ---------- star ratings (q9, q14) ---------- */
+document.querySelectorAll("[data-stars]").forEach(container=>{
+  const fieldName = container.getAttribute("data-stars");
+  let value = 0;
+  for(let i=1;i<=5;i++){
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "star-btn";
+    btn.textContent = "★";
+    btn.dataset.val = i;
+    btn.addEventListener("click", ()=>{
+      value = i;
+      container.dataset.value = value;
+      [...container.children].forEach((c,idx)=>{
+        c.classList.toggle("on", idx < value);
+      });
+    });
+    container.appendChild(btn);
+  }
+  container.dataset.value = "";
+  container.dataset.fieldname = fieldName;
+});
+
+/* ---------- NPS 0-10 (q19) ---------- */
+const npsRow = document.getElementById("npsRow");
+let npsValue = "";
+for(let i=0;i<=10;i++){
+  const btn = document.createElement("button");
+  btn.type="button";
+  btn.className="nps-btn";
+  btn.textContent=i;
+  btn.addEventListener("click", ()=>{
+    npsValue = i;
+    [...npsRow.children].forEach(c=>c.classList.remove("on"));
+    btn.classList.add("on");
+  });
+  npsRow.appendChild(btn);
+}
+
+/* ---------- "other" text reveal ---------- */
+document.querySelectorAll("[data-other-toggle]").forEach(cb=>{
+  cb.addEventListener("change", ()=>{
+    const el = document.getElementById(cb.dataset.otherToggle);
+    el.style.display = cb.checked ? "block" : "none";
+  });
+});
+
+/* ---------- checkbox group limit (q17 max 3) ---------- */
+document.querySelectorAll("[data-checkgroup]").forEach(group=>{
+  const limit = parseInt(group.dataset.limit || "0", 10);
+  if(!limit) return;
+  const noteId = group.closest(".q").querySelector(".limit-note");
+  group.querySelectorAll("input[type=checkbox]").forEach(cb=>{
+    cb.addEventListener("change", ()=>{
+      const checked = group.querySelectorAll("input[type=checkbox]:checked");
+      if(checked.length > limit){
+        cb.checked = false;
+        if(noteId){ noteId.classList.add("show"); setTimeout(()=>noteId.classList.remove("show"), 2500); }
+      }
+    });
+  });
+});
+
+/* ---------- pagination ---------- */
+const cards = [...document.querySelectorAll(".card")];
+let current = 0;
+const progressFill = document.getElementById("progressFill");
+const progressLabel = document.getElementById("progressLabel");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const submitBtn = document.getElementById("submitBtn");
+
+function showCard(i){
+  cards.forEach((c,idx)=>c.classList.toggle("active", idx===i));
+  progressFill.style.width = `${((i+1)/cards.length)*100}%`;
+  progressLabel.textContent = `ส่วนที่ ${i+1} / ${cards.length}`;
+  prevBtn.style.visibility = i===0 ? "hidden" : "visible";
+  nextBtn.style.display = i===cards.length-1 ? "none" : "inline-block";
+  submitBtn.style.display = i===cards.length-1 ? "inline-block" : "none";
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function validateCurrentCard(){
+  const card = cards[current];
+  const requiredInputs = card.querySelectorAll("[required]");
+  for(const el of requiredInputs){
+    if(el.type === "radio"){
+      const group = card.querySelectorAll(`input[name="${el.name}"]`);
+      const anyChecked = [...group].some(g=>g.checked);
+      if(!anyChecked){ el.reportValidity ? el.reportValidity() : alert("กรุณาตอบคำถามให้ครบก่อนไปต่อ"); return false; }
+    } else if(!el.value){
+      el.reportValidity ? el.reportValidity() : alert("กรุณาตอบคำถามให้ครบก่อนไปต่อ");
+      return false;
+    }
+  }
+  return true;
+}
+
+nextBtn.addEventListener("click", ()=>{
+  if(!validateCurrentCard()) return;
+  if(current < cards.length-1){ current++; showCard(current); }
+});
+prevBtn.addEventListener("click", ()=>{
+  if(current > 0){ current--; showCard(current); }
+});
+showCard(current);
+
+/* ---------- submit ---------- */
+const form = document.getElementById("surveyForm");
+const statusMsg = document.getElementById("statusMsg");
+
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  if(!validateCurrentCard()) return;
+
+  const data = {};
+  data["timestamp"] = new Date().toISOString();
+
+  // simple fields (select/radio/textarea with name attr)
+  form.querySelectorAll("select[name], textarea[name]").forEach(el=>{
+    data[el.name] = el.value;
+  });
+  form.querySelectorAll("input[type=radio][name]").forEach(el=>{
+    if(el.checked) data[el.name] = el.value;
+  });
+
+  // checkbox groups -> comma separated
+  document.querySelectorAll("[data-checkgroup]").forEach(group=>{
+    const name = group.dataset.checkgroup;
+    const vals = [...group.querySelectorAll("input[type=checkbox]:checked")].map(c=>c.value);
+    data[name] = vals.join(", ");
+  });
+  data["q6_other_detail"] = document.getElementById("q6_other").value;
+  data["q7_other_detail"] = document.getElementById("q7_other").value;
+  data["q11_other_detail"] = document.getElementById("q11_other").value;
+  data["q13_other_detail"] = document.getElementById("q13_other").value;
+  data["q16_other_detail"] = document.getElementById("q16_other").value;
+
+  // stars
+  document.querySelectorAll("[data-stars]").forEach(container=>{
+    data[container.dataset.fieldname] = container.dataset.value || "";
+  });
+
+  // NPS
+  data["q19_nps_score"] = npsValue;
+
+  statusMsg.textContent = "กำลังบันทึกข้อมูล...";
+  statusMsg.classList.remove("err");
+
+  try{
+    if(GAS_URL.includes("PASTE_YOUR")){
+      throw new Error("no-endpoint");
+    }
+    await fetch(GAS_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify(data)
+    });
+    form.style.display = "none";
+    document.querySelector(".nav-row").style.display = "none";
+    document.getElementById("doneScreen").style.display = "block";
+  }catch(err){
+    statusMsg.textContent = "ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง หรือแจ้งผู้ดูแลระบบ";
+    statusMsg.classList.add("err");
+  }
+});
+</script>
+</body>
+</html>

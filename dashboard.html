@@ -159,7 +159,8 @@
 
 <script>
 /* ============ CONFIG ============ */
-let GAS_URL = localStorage.getItem("survey_gas_url") || "";
+const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbyadpVzAFjnxxCIL4LXGWh8cwd1Uycjcn--6BVZIOBgY9JjB3BEQLOBOotQOFBd8jxf/exec";
+let GAS_URL = localStorage.getItem("survey_gas_url") || DEFAULT_GAS_URL;
 const REFRESH_MS = 30000;
 
 const setupBar = document.getElementById("setupBar");

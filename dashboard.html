@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard วิเคราะห์ผลสำรวจแพทย์ Part-time | โรงพยาบาลกรุงเทพสุราษฎร์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#002D74;
+    --navy-deep:#001A4F;
+    --accent:#B12028;
+    --paper:#f5f4f1;
+    --card:#ffffff;
+    --line:#e2e2e0;
+    --ink:#1c2226;
+    --ink-soft:#57626a;
+    --good:#3F7A52;
+    --warn:#C98A2C;
+    --bad:#B12028;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:'Sarabun',sans-serif; font-size:15px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1280px;margin:0 auto;padding:0 22px 60px;}
+
+  header.top{
+    background:linear-gradient(180deg,var(--navy-deep) 0%,var(--navy) 100%);
+    color:#f2efe9; padding:26px 22px;
+  }
+  header.top .inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:14px;}
+  .brand .chip{background:#fff;border-radius:3px;padding:8px 12px;display:flex;align-items:center;}
+  .brand .chip img{height:22px;width:auto;display:block;}
+  .brand h1{font-family:'Noto Serif Thai',serif;font-weight:600;font-size:19px;margin:0;}
+  .brand p{margin:2px 0 0;font-size:12.5px;color:#c9d3d8;}
+
+  .live-box{display:flex;align-items:center;gap:10px;font-size:13px;color:#dfe6e8;}
+  .dot{width:8px;height:8px;border-radius:50%;background:#5ecb7b;box-shadow:0 0 0 0 rgba(94,203,123,.6);animation:pulse 2s infinite;}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(94,203,123,.55);}
+    70%{box-shadow:0 0 0 8px rgba(94,203,123,0);}
+    100%{box-shadow:0 0 0 0 rgba(94,203,123,0);}
+  }
+  button.refresh{
+    font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;
+    background:transparent;border:1px solid #6c7f96;color:#f2efe9;
+    padding:7px 14px;border-radius:2px;cursor:pointer;
+  }
+  button.refresh:hover{border-color:#fff;}
+
+  .setup-bar{
+    background:#fff8e8;border-bottom:1px solid #e8dcb8;padding:12px 22px;font-size:13.5px;color:#6b5a2a;
+  }
+  .setup-bar .inner{max-width:1280px;margin:0 auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .setup-bar input{
+    font-family:'Sarabun',sans-serif;font-size:13px;padding:6px 9px;border:1px solid #d8c98a;border-radius:2px;flex:1;min-width:260px;
+  }
+  .setup-bar button{
+    font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;background:var(--navy);color:#fff;border:none;
+    padding:7px 14px;border-radius:2px;cursor:pointer;
+  }
+
+  .filter-row{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:26px 0 18px;
+  }
+  .filter-row label{font-size:13.5px;color:var(--ink-soft);}
+  .filter-row select{
+    font-family:'Sarabun',sans-serif;font-size:14px;padding:8px 30px 8px 12px;border:1px solid var(--line);border-radius:2px;
+    background:#fff;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%2357626a' stroke-width='1.6' fill='none'/></svg>");
+    background-repeat:no-repeat;background-position:right 10px center;appearance:none;
+  }
+  .updated-label{font-size:12.5px;color:var(--ink-soft);margin-inline-start:auto;}
+
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:18px 20px;}
+  .kpi .label{font-size:12.5px;color:var(--ink-soft);margin:0 0 8px;}
+  .kpi .value{font-family:'Noto Serif Thai',serif;font-weight:600;font-size:30px;color:var(--navy-deep);margin:0;}
+  .kpi .sub{font-size:12px;color:var(--ink-soft);margin-top:6px;}
+  .kpi .sub.good{color:var(--good);}
+  .kpi .sub.bad{color:var(--bad);}
+
+  .section-title{
+    font-family:'Noto Serif Thai',serif;font-weight:600;font-size:18px;color:var(--navy-deep);
+    margin:34px 0 14px;
+  }
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:18px 20px;}
+  .panel h3{font-size:14.5px;font-weight:600;margin:0 0 4px;color:var(--ink);}
+  .panel p.hint{font-size:12px;color:var(--ink-soft);margin:0 0 14px;}
+  .panel canvas{max-height:320px;}
+  .panel.wide{grid-column:1 / -1;}
+
+  .feed{max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
+  .feed-item{border-top:1px solid var(--line);padding-top:12px;}
+  .feed-item:first-child{border-top:none;padding-top:0;}
+  .feed-item .meta{font-size:12px;color:var(--ink-soft);margin-bottom:4px;}
+  .feed-item .q{font-size:12.5px;font-weight:600;color:var(--navy-deep);margin:8px 0 2px;}
+  .feed-item .a{font-size:14px;margin:0;}
+
+  .empty{color:var(--ink-soft);font-size:14px;padding:40px 0;text-align:center;}
+  .loading-line{font-size:13px;color:var(--ink-soft);}
+
+  @media (max-width: 860px){
+    .kpi-grid{grid-template-columns:repeat(2,1fr);}
+    .grid2{grid-template-columns:1fr;}
+    header.top .inner{flex-direction:column;align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="inner">
+    <div class="brand">
+      <span class="chip"><img src="logo-2.svg" alt="โรงพยาบาลกรุงเทพสุราษฎร์"></span>
+      <div>
+        <h1>Dashboard วิเคราะห์ผลสำรวจแพทย์ Part-time</h1>
+        <p>โรงพยาบาลกรุงเทพสุราษฎร์ · สำหรับผู้บริหาร</p>
+      </div>
+    </div>
+    <div class="live-box">
+      <span class="dot"></span>
+      <span id="liveLabel">อัปเดตอัตโนมัติทุก 30 วินาที</span>
+      <button class="refresh" id="refreshBtn" type="button">รีเฟรชตอนนี้</button>
+    </div>
+  </div>
+</header>
+
+<div class="setup-bar" id="setupBar">
+  <div class="inner">
+    <span>ตั้งค่าครั้งแรก: ใส่ Web App URL ของ Google Apps Script (จากไฟล์ Code.gs)</span>
+    <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/XXXXXXXX/exec">
+    <button id="saveGasUrl" type="button">บันทึกและโหลดข้อมูล</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="filter-row">
+    <label for="specialtyFilter">กรองตามสาขา:</label>
+    <select id="specialtyFilter"><option value="__all__">ทุกสาขา</option></select>
+    <span class="updated-label" id="updatedLabel"></span>
+  </div>
+
+  <div id="content">
+    <p class="empty" id="emptyState">กำลังโหลดข้อมูล…</p>
+  </div>
+
+</div>
+
+<script>
+/* ============ CONFIG ============ */
+let GAS_URL = localStorage.getItem("survey_gas_url") || "";
+const REFRESH_MS = 30000;
+
+const setupBar = document.getElementById("setupBar");
+const gasUrlInput = document.getElementById("gasUrlInput");
+document.getElementById("saveGasUrl").addEventListener("click", ()=>{
+  const v = gasUrlInput.value.trim();
+  if(!v) return;
+  GAS_URL = v;
+  localStorage.setItem("survey_gas_url", v);
+  setupBar.style.display = "none";
+  loadData();
+});
+if(GAS_URL){
+  gasUrlInput.value = GAS_URL;
+  setupBar.style.display = "none";
+}
+
+document.getElementById("refreshBtn").addEventListener("click", loadData);
+
+/* ============ palette ============ */
+const PALETTE = ["#002D74","#B12028","#3B5EA8","#758592","#C98A2C","#4E7C59","#7B4B94","#1F7A8C","#9A6A3C","#5E5E8C"];
+
+/* ============ column groups ============ */
+const LIKERT_FIELDS = [
+  ["q5_appointment_system","ระบบนัดหมายผู้ป่วย"],
+  ["q5_staff_coordination","การประสานงานของเจ้าหน้าที่"],
+  ["q5_surgery_queue_speed","ความรวดเร็วคิวผ่าตัด"],
+  ["q5_gi_queue_speed","ความรวดเร็วคิว GI"],
+  ["q5_or_readiness","ความพร้อมห้องผ่าตัด"],
+  ["q5_endoscopy_room_readiness","ความพร้อมห้องส่องกล้อง"],
+  ["q5_equipment_readiness","ความพร้อมเครื่องมือ"],
+  ["q5_nursing_team_readiness","ความพร้อมทีมพยาบาล"],
+  ["q5_insurance_finance_speed","ความรวดเร็วประกัน/การเงิน"],
+  ["q5_interdept_communication","การสื่อสารระหว่างหน่วยงาน"],
+  ["q5_doctor_facilitation","การอำนวยความสะดวกแพทย์"],
+  ["q5_post_visit_followup","การติดตามผู้ป่วยหลังพบแพทย์"],
+];
+
+let charts = {};
+let allRows = [];
+
+/* ============ data loading ============ */
+async function loadData(){
+  if(!GAS_URL){ setupBar.style.display = "block"; return; }
+  try{
+    const dashboardKey = new URLSearchParams(window.location.search).get("key");
+    const keyParam = dashboardKey ? `&key=${encodeURIComponent(dashboardKey)}` : "";
+    const res = await fetch(`${GAS_URL}?action=data&t=${Date.now()}${keyParam}`);
+    const json = await res.json();
+    if(json.error){ throw new Error(json.error); }
+    allRows = json.rows || [];
+    populateSpecialtyFilter(allRows);
+    render(getFilteredRows());
+    document.getElementById("updatedLabel").textContent = "อัปเดตล่าสุด " + new Date().toLocaleTimeString("th-TH");
+  }catch(err){
+    document.getElementById("content").innerHTML = `<p class="empty">ไม่สามารถโหลดข้อมูลได้ กรุณาตรวจสอบ URL หรือสิทธิ์การเข้าถึง (${err.message})</p>`;
+  }
+}
+
+function populateSpecialtyFilter(rows){
+  const sel = document.getElementById("specialtyFilter");
+  const current = sel.value;
+  const specialties = [...new Set(rows.map(r=>r.q1_specialty).filter(Boolean))].sort();
+  sel.innerHTML = `<option value="__all__">ทุกสาขา (${rows.length})</option>` +
+    specialties.map(s=>`<option value="${s}">${s} (${rows.filter(r=>r.q1_specialty===s).length})</option>`).join("");
+  if([...sel.options].some(o=>o.value===current)) sel.value = current;
+}
+document.getElementById("specialtyFilter").addEventListener("change", ()=> render(getFilteredRows()));
+
+function getFilteredRows(){
+  const val = document.getElementById("specialtyFilter").value;
+  if(!val || val === "__all__") return allRows;
+  return allRows.filter(r=>r.q1_specialty === val);
+}
+
+/* ============ aggregation helpers ============ */
+function countCommaField(rows, field){
+  const counts = {};
+  rows.forEach(r=>{
+    const raw = (r[field]||"").toString().trim();
+    if(!raw) return;
+    raw.split(",").map(s=>s.trim()).filter(Boolean).forEach(v=>{
+      counts[v] = (counts[v]||0) + 1;
+    });
+  });
+  return counts;
+}
+function countCategorical(rows, field){
+  const counts = {};
+  rows.forEach(r=>{
+    const v = (r[field]||"").toString().trim();
+    if(!v) return;
+    counts[v] = (counts[v]||0) + 1;
+  });
+  return counts;
+}
+function average(rows, field){
+  const nums = rows.map(r=>parseFloat(r[field])).filter(n=>!isNaN(n));
+  if(!nums.length) return null;
+  return nums.reduce((a,b)=>a+b,0) / nums.length;
+}
+function sortEntriesDesc(obj){
+  return Object.entries(obj).sort((a,b)=>b[1]-a[1]);
+}
+
+function npsStats(rows){
+  const nums = rows.map(r=>parseInt(r.q19_nps_score)).filter(n=>!isNaN(n));
+  const total = nums.length;
+  if(!total) return {score:null,promoters:0,passives:0,detractors:0,total:0};
+  const promoters = nums.filter(n=>n>=9).length;
+  const passives = nums.filter(n=>n>=7 && n<=8).length;
+  const detractors = nums.filter(n=>n<=6).length;
+  const score = Math.round(((promoters/total) - (detractors/total)) * 100);
+  return {score, promoters, passives, detractors, total};
+}
+
+function dateTrend(rows){
+  const byDate = {};
+  rows.forEach(r=>{
+    const t = r.timestamp ? new Date(r.timestamp) : null;
+    if(!t || isNaN(t)) return;
+    const key = t.toISOString().slice(0,10);
+    byDate[key] = (byDate[key]||0) + 1;
+  });
+  const dates = Object.keys(byDate).sort();
+  let running = 0;
+  const cumulative = dates.map(d=>{ running += byDate[d]; return running; });
+  return {dates, counts: dates.map(d=>byDate[d]), cumulative};
+}
+
+/* ============ chart builders ============ */
+function makeBar(canvasId, labels, values, horizontal=true){
+  if(charts[canvasId]) charts[canvasId].destroy();
+  const ctx = document.getElementById(canvasId);
+  charts[canvasId] = new Chart(ctx, {
+    type: "bar",
+    data: { labels, datasets: [{ data: values, backgroundColor: PALETTE[0], borderRadius: 2, maxBarThickness: 26 }] },
+    options: {
+      indexAxis: horizontal ? "y" : "x",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { beginAtZero: true, grid: { color: "#eee" } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+}
+function makeDonut(canvasId, labels, values){
+  if(charts[canvasId]) charts[canvasId].destroy();
+  const ctx = document.getElementById(canvasId);
+  charts[canvasId] = new Chart(ctx, {
+    type: "doughnut",
+    data: { labels, datasets: [{ data: values, backgroundColor: PALETTE }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: "right", labels: { boxWidth: 12, font: { size: 11 } } } }
+    }
+  });
+}
+function makeLine(canvasId, labels, values, cumulative){
+  if(charts[canvasId]) charts[canvasId].destroy();
+  const ctx = document.getElementById(canvasId);
+  charts[canvasId] = new Chart(ctx, {
+    data: {
+      labels,
+      datasets: [
+        { type: "bar", label: "คำตอบต่อวัน", data: values, backgroundColor: "#3B5EA8", borderRadius: 2, order: 2 },
+        { type: "line", label: "สะสม", data: cumulative, borderColor: "#B12028", backgroundColor: "#B12028", tension: .25, yAxisID: "y1", order: 1 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: { legend: { position: "top", labels: { boxWidth: 12, font: { size: 11 } } } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: "#eee" } },
+        y1: { beginAtZero: true, position: "right", grid: { display: false } }
+      }
+    }
+  });
+}
+function makeStackedBar(canvasId, labelsRow){
+  if(charts[canvasId]) charts[canvasId].destroy();
+  const ctx = document.getElementById(canvasId);
+  charts[canvasId] = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["สัดส่วนแพทย์"],
+      datasets: [
+        { label: "Promoter (9-10)", data: [labelsRow.promoters], backgroundColor: "#3F7A52" },
+        { label: "Passive (7-8)", data: [labelsRow.passives], backgroundColor: "#C98A2C" },
+        { label: "Detractor (0-6)", data: [labelsRow.detractors], backgroundColor: "#B12028" },
+      ]
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } },
+      scales: { x: { stacked: true, beginAtZero: true }, y: { stacked: true } }
+    }
+  });
+}
+
+/* ============ main render ============ */
+function render(rows){
+  document.getElementById("emptyState").style.display = rows.length ? "none" : "block";
+  const content = document.getElementById("content");
+
+  if(!rows.length){
+    content.innerHTML = `<p class="empty" id="emptyState">ยังไม่มีข้อมูลคำตอบ</p>`;
+    return;
+  }
+
+  if(!document.getElementById("kpiGrid")){
+    content.innerHTML = buildLayout();
+  }
+
+  // KPIs
+  const nps = npsStats(rows);
+  const likertOverall = average(rows, "__likert_avg__"); // placeholder, computed below
+  const likertAvgs = LIKERT_FIELDS.map(([f]) => average(rows, f)).filter(v=>v!==null);
+  const overallSat = likertAvgs.length ? (likertAvgs.reduce((a,b)=>a+b,0)/likertAvgs.length) : null;
+  const lostHigh = rows.filter(r=>["31-50%","มากกว่า 50%"].includes((r.q8_lostfollowup||"").trim())).length;
+  const lostHighPct = rows.length ? Math.round((lostHigh/rows.length)*100) : 0;
+
+  document.getElementById("kpiTotal").textContent = rows.length;
+  document.getElementById("kpiNps").textContent = nps.score===null ? "-" : nps.score;
+  document.getElementById("kpiNpsSub").textContent = nps.total ? `จาก ${nps.total} คำตอบ` : "";
+  document.getElementById("kpiSat").textContent = overallSat===null ? "-" : overallSat.toFixed(2);
+  document.getElementById("kpiLost").textContent = lostHighPct + "%";
+  document.getElementById("kpiLost").parentElement.querySelector(".sub").textContent = "แพทย์ที่รายงาน Lost Follow-up > 30%";
+  document.getElementById("kpiLost").parentElement.querySelector(".sub").className = "sub " + (lostHighPct>=30?"bad":"");
+
+  // Trend
+  const trend = dateTrend(rows);
+  makeLine("chartTrend", trend.dates, trend.counts, trend.cumulative);
+
+  // NPS breakdown
+  makeStackedBar("chartNps", nps);
+
+  // Likert
+  makeBar("chartLikert", LIKERT_FIELDS.map(([,l])=>l), LIKERT_FIELDS.map(([f])=>{
+    const v = average(rows, f); return v===null ? 0 : Number(v.toFixed(2));
+  }));
+
+  // Specialty donut
+  const specCounts = countCategorical(rows, "q1_specialty");
+  const specEntries = sortEntriesDesc(specCounts);
+  makeDonut("chartSpecialty", specEntries.map(e=>e[0]), specEntries.map(e=>e[1]));
+
+  // Barriers (q6)
+  const barrierEntries = sortEntriesDesc(countCommaField(rows, "q6_barriers")).slice(0,12);
+  makeBar("chartBarriers", barrierEntries.map(e=>e[0]), barrierEntries.map(e=>e[1]));
+
+  // Refusal reasons (q7)
+  const refusalEntries = sortEntriesDesc(countCommaField(rows, "q7_refusal")).slice(0,10);
+  makeBar("chartRefusal", refusalEntries.map(e=>e[0]), refusalEntries.map(e=>e[1]));
+
+  // Lost follow-up distribution (q8)
+  const lostOrder = ["น้อยกว่า 10%","10-20%","21-30%","31-50%","มากกว่า 50%"];
+  const lostCounts = countCategorical(rows, "q8_lostfollowup");
+  makeDonut("chartLost", lostOrder.filter(k=>lostCounts[k]), lostOrder.filter(k=>lostCounts[k]).map(k=>lostCounts[k]));
+
+  // Growth enablers (q13)
+  const enablerEntries = sortEntriesDesc(countCommaField(rows, "q13_growth_enablers")).slice(0,12);
+  makeBar("chartEnablers", enablerEntries.map(e=>e[0]), enablerEntries.map(e=>e[1]));
+
+  // Growth segments (q16)
+  const segmentEntries = sortEntriesDesc(countCommaField(rows, "q16_growth_segments")).slice(0,10);
+  makeBar("chartSegments", segmentEntries.map(e=>e[0]), segmentEntries.map(e=>e[1]));
+
+  // Priorities (q17)
+  const priorityEntries = sortEntriesDesc(countCommaField(rows, "q17_priorities")).slice(0,10);
+  makeBar("chartPriorities", priorityEntries.map(e=>e[0]), priorityEntries.map(e=>e[1]));
+
+  // Open feedback feed (most recent first)
+  renderFeed(rows);
+}
+
+function renderFeed(rows){
+  const sorted = [...rows].sort((a,b)=> new Date(b.timestamp) - new Date(a.timestamp));
+  const feedEl = document.getElementById("feedList");
+  const openFields = [
+    ["q21_top3_problems","ปัญหาสำคัญ 3 อันดับแรก"],
+    ["q22_six_month_actions","สิ่งที่ควรเร่งทำใน 6 เดือน"],
+    ["q23_additional_suggestions","ข้อเสนอแนะเพิ่มเติม"],
+    ["q24_golden_question","หากแก้ได้ 1 เรื่อง"],
+  ];
+  feedEl.innerHTML = sorted.slice(0,30).map(r=>{
+    const date = r.timestamp ? new Date(r.timestamp).toLocaleString("th-TH") : "";
+    const answers = openFields.map(([f,label])=>{
+      const v = (r[f]||"").toString().trim();
+      if(!v) return "";
+      return `<p class="q">${label}</p><p class="a">${escapeHtml(v)}</p>`;
+    }).join("");
+    if(!answers) return "";
+    return `<div class="feed-item"><div class="meta">${escapeHtml(r.q1_specialty||"ไม่ระบุสาขา")} · ${date}</div>${answers}</div>`;
+  }).filter(Boolean).join("") || `<p class="empty">ยังไม่มีคำตอบปลายเปิด</p>`;
+}
+function escapeHtml(str){
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function buildLayout(){
+  return `
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi"><p class="label">จำนวนแพทย์ที่ตอบแบบสอบถาม</p><p class="value" id="kpiTotal">-</p></div>
+      <div class="kpi"><p class="label">Doctor NPS</p><p class="value" id="kpiNps">-</p><p class="sub" id="kpiNpsSub"></p></div>
+      <div class="kpi"><p class="label">ความพึงพอใจเฉลี่ย (จาก 5)</p><p class="value" id="kpiSat">-</p></div>
+      <div class="kpi"><p class="label">Lost Follow-up สูง</p><p class="value" id="kpiLost">-</p><p class="sub"></p></div>
+    </div>
+
+    <p class="section-title">แนวโน้มการตอบแบบสอบถาม</p>
+    <div class="grid2">
+      <div class="panel wide"><h3>จำนวนคำตอบต่อวัน และยอดสะสม</h3><canvas id="chartTrend"></canvas></div>
+    </div>
+
+    <p class="section-title">Doctor NPS และความพึงพอใจต่อการสนับสนุน</p>
+    <div class="grid2">
+      <div class="panel"><h3>สัดส่วน Promoter / Passive / Detractor</h3><p class="hint">คะแนนแนะนำ 0-10: Promoter 9-10, Passive 7-8, Detractor 0-6</p><canvas id="chartNps"></canvas></div>
+      <div class="panel"><h3>คะแนนความพึงพอใจเฉลี่ยรายด้าน (1-5)</h3><p class="hint">ยิ่งคะแนนต่ำ ยิ่งควรเร่งแก้ไข</p><canvas id="chartLikert"></canvas></div>
+    </div>
+
+    <p class="section-title">Pain Point ที่ทำให้ผู้ป่วยหลุดจากระบบ</p>
+    <div class="grid2">
+      <div class="panel"><h3>อุปสรรคสำคัญต่อการส่งผู้ป่วยผ่าตัด/GI</h3><canvas id="chartBarriers"></canvas></div>
+      <div class="panel"><h3>เหตุผลที่ผู้ป่วยมักปฏิเสธการรักษา</h3><canvas id="chartRefusal"></canvas></div>
+      <div class="panel"><h3>สัดส่วน Lost Follow-up</h3><canvas id="chartLost"></canvas></div>
+      <div class="panel"><h3>สัดส่วนแพทย์ตามสาขาที่ตอบแบบสอบถาม</h3><canvas id="chartSpecialty"></canvas></div>
+    </div>
+
+    <p class="section-title">โอกาสในการเพิ่มจำนวนผู้ป่วย</p>
+    <div class="grid2">
+      <div class="panel"><h3>สิ่งที่จะช่วยเพิ่มจำนวนผู้ป่วยได้มากที่สุด</h3><canvas id="chartEnablers"></canvas></div>
+      <div class="panel"><h3>กลุ่มผู้ป่วยที่มีศักยภาพเติบโตสูงสุด</h3><canvas id="chartSegments"></canvas></div>
+      <div class="panel wide"><h3>เรื่องที่แพทย์อยากให้เร่งพัฒนาที่สุด (Top 3 โหวต)</h3><canvas id="chartPriorities"></canvas></div>
+    </div>
+
+    <p class="section-title">เสียงจากแพทย์ (คำถามปลายเปิดล่าสุด)</p>
+    <div class="grid2">
+      <div class="panel wide"><div class="feed" id="feedList"></div></div>
+    </div>
+  `;
+}
+
+/* ============ boot ============ */
+loadData();
+setInterval(loadData, REFRESH_MS);
+</script>
+</body>
+</html>

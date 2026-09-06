@@ -7,6 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Thai:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+  // Fallback in case cdnjs is blocked by a firewall / ad-blocker / extension.
+  if (typeof Chart === "undefined") {
+    document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"><\/script>');
+  }
+</script>
 <style>
   :root{
     --navy:#002D74;
@@ -96,7 +102,9 @@
   .panel{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:18px 20px;}
   .panel h3{font-size:14.5px;font-weight:600;margin:0 0 4px;color:var(--ink);}
   .panel p.hint{font-size:12px;color:var(--ink-soft);margin:0 0 14px;}
-  .panel canvas{max-height:320px;}
+  .panel canvas{display:block;}
+  .chart-box{position:relative;height:300px;}
+  .chart-box canvas{width:100% !important;height:100% !important;}
   .panel.wide{grid-column:1 / -1;}
 
   .feed{max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;}
@@ -205,6 +213,10 @@ let allRows = [];
 /* ============ data loading ============ */
 async function loadData(){
   if(!GAS_URL){ setupBar.style.display = "block"; return; }
+  if(typeof Chart === "undefined"){
+    document.getElementById("content").innerHTML = `<p class="empty">ไม่สามารถโหลดไลบรารีกราฟ (Chart.js) ได้ ซึ่งมักเกิดจากอินเทอร์เน็ต/ไฟร์วอลล์ขององค์กร หรือส่วนขยายบล็อกโฆษณา (Ad Blocker) บล็อกการเชื่อมต่อไปยัง cdnjs.cloudflare.com หรือ cdn.jsdelivr.net กรุณาปิด Ad Blocker แล้วรีเฟรชหน้า หรือลองเปิดผ่านเครือข่ายอื่น</p>`;
+    return;
+  }
   try{
     const dashboardKey = new URLSearchParams(window.location.search).get("key");
     const keyParam = dashboardKey ? `&key=${encodeURIComponent(dashboardKey)}` : "";
@@ -216,7 +228,11 @@ async function loadData(){
     render(getFilteredRows());
     document.getElementById("updatedLabel").textContent = "อัปเดตล่าสุด " + new Date().toLocaleTimeString("th-TH");
   }catch(err){
-    document.getElementById("content").innerHTML = `<p class="empty">ไม่สามารถโหลดข้อมูลได้ กรุณาตรวจสอบ URL หรือสิทธิ์การเข้าถึง (${err.message})</p>`;
+    document.getElementById("content").innerHTML = `<p class="empty">ไม่สามารถเชื่อมต่อกับ Google Apps Script ได้ (${err.message})<br><br>
+      กรุณาตรวจสอบ:<br>
+      1) เปิดลิงก์ Web App URL นี้ตรงๆ ในแท็บใหม่ (ต่อท้ายด้วย <code>?action=data</code>) — ถ้าขึ้นหน้า Login ของ Google หรือ error แปลว่า Deploy ตั้งค่า "Who has access" ไม่ใช่ "Anyone"<br>
+      2) ลองปิด Ad Blocker / VPN / ส่วนขยายเบราว์เซอร์ที่อาจบล็อก script.google.com แล้วรีเฟรชอีกครั้ง<br>
+      3) ตรวจสอบว่าได้กด Deploy > Manage deployments > New version หลังแก้ไข Code.gs ล่าสุดแล้ว</p>`;
   }
 }
 
@@ -480,28 +496,28 @@ function buildLayout(){
 
     <p class="section-title">แนวโน้มการตอบแบบสอบถาม</p>
     <div class="grid2">
-      <div class="panel wide"><h3>จำนวนคำตอบต่อวัน และยอดสะสม</h3><canvas id="chartTrend"></canvas></div>
+      <div class="panel wide"><h3>จำนวนคำตอบต่อวัน และยอดสะสม</h3><div class="chart-box"><canvas id="chartTrend"></canvas></div></div>
     </div>
 
     <p class="section-title">Doctor NPS และความพึงพอใจต่อการสนับสนุน</p>
     <div class="grid2">
-      <div class="panel"><h3>สัดส่วน Promoter / Passive / Detractor</h3><p class="hint">คะแนนแนะนำ 0-10: Promoter 9-10, Passive 7-8, Detractor 0-6</p><canvas id="chartNps"></canvas></div>
-      <div class="panel"><h3>คะแนนความพึงพอใจเฉลี่ยรายด้าน (1-5)</h3><p class="hint">ยิ่งคะแนนต่ำ ยิ่งควรเร่งแก้ไข</p><canvas id="chartLikert"></canvas></div>
+      <div class="panel"><h3>สัดส่วน Promoter / Passive / Detractor</h3><p class="hint">คะแนนแนะนำ 0-10: Promoter 9-10, Passive 7-8, Detractor 0-6</p><div class="chart-box"><canvas id="chartNps"></canvas></div></div>
+      <div class="panel"><h3>คะแนนความพึงพอใจเฉลี่ยรายด้าน (1-5)</h3><p class="hint">ยิ่งคะแนนต่ำ ยิ่งควรเร่งแก้ไข</p><div class="chart-box"><canvas id="chartLikert"></canvas></div></div>
     </div>
 
     <p class="section-title">Pain Point ที่ทำให้ผู้ป่วยหลุดจากระบบ</p>
     <div class="grid2">
-      <div class="panel"><h3>อุปสรรคสำคัญต่อการส่งผู้ป่วยผ่าตัด/GI</h3><canvas id="chartBarriers"></canvas></div>
-      <div class="panel"><h3>เหตุผลที่ผู้ป่วยมักปฏิเสธการรักษา</h3><canvas id="chartRefusal"></canvas></div>
-      <div class="panel"><h3>สัดส่วน Lost Follow-up</h3><canvas id="chartLost"></canvas></div>
-      <div class="panel"><h3>สัดส่วนแพทย์ตามสาขาที่ตอบแบบสอบถาม</h3><canvas id="chartSpecialty"></canvas></div>
+      <div class="panel"><h3>อุปสรรคสำคัญต่อการส่งผู้ป่วยผ่าตัด/GI</h3><div class="chart-box"><canvas id="chartBarriers"></canvas></div></div>
+      <div class="panel"><h3>เหตุผลที่ผู้ป่วยมักปฏิเสธการรักษา</h3><div class="chart-box"><canvas id="chartRefusal"></canvas></div></div>
+      <div class="panel"><h3>สัดส่วน Lost Follow-up</h3><div class="chart-box"><canvas id="chartLost"></canvas></div></div>
+      <div class="panel"><h3>สัดส่วนแพทย์ตามสาขาที่ตอบแบบสอบถาม</h3><div class="chart-box"><canvas id="chartSpecialty"></canvas></div></div>
     </div>
 
     <p class="section-title">โอกาสในการเพิ่มจำนวนผู้ป่วย</p>
     <div class="grid2">
-      <div class="panel"><h3>สิ่งที่จะช่วยเพิ่มจำนวนผู้ป่วยได้มากที่สุด</h3><canvas id="chartEnablers"></canvas></div>
-      <div class="panel"><h3>กลุ่มผู้ป่วยที่มีศักยภาพเติบโตสูงสุด</h3><canvas id="chartSegments"></canvas></div>
-      <div class="panel wide"><h3>เรื่องที่แพทย์อยากให้เร่งพัฒนาที่สุด (Top 3 โหวต)</h3><canvas id="chartPriorities"></canvas></div>
+      <div class="panel"><h3>สิ่งที่จะช่วยเพิ่มจำนวนผู้ป่วยได้มากที่สุด</h3><div class="chart-box"><canvas id="chartEnablers"></canvas></div></div>
+      <div class="panel"><h3>กลุ่มผู้ป่วยที่มีศักยภาพเติบโตสูงสุด</h3><div class="chart-box"><canvas id="chartSegments"></canvas></div></div>
+      <div class="panel wide"><h3>เรื่องที่แพทย์อยากให้เร่งพัฒนาที่สุด (Top 3 โหวต)</h3><div class="chart-box"><canvas id="chartPriorities"></canvas></div></div>
     </div>
 
     <p class="section-title">เสียงจากแพทย์ (คำถามปลายเปิดล่าสุด)</p>

@@ -368,7 +368,8 @@ function makeStackedBar(canvasId, labelsRow){
 
 /* ============ main render ============ */
 function render(rows){
-  document.getElementById("emptyState").style.display = rows.length ? "none" : "block";
+  const emptyStateEl = document.getElementById("emptyState");
+  if(emptyStateEl) emptyStateEl.style.display = rows.length ? "none" : "block";
   const content = document.getElementById("content");
 
   if(!rows.length){
